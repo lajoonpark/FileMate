@@ -62,7 +62,7 @@ struct PreviewView: View {
                     .font(.caption)
             }
         }
-        .onChange(of: sortOrder) { _, newOrder in
+        .onChange(of: sortOrder) { newOrder in
             items.sort(using: newOrder)
         }
     }
