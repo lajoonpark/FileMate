@@ -98,28 +98,19 @@ struct PreviewView: View {
     }
 
     private func iconName(for category: String) -> String {
-        switch category {
-        case "Images":      return "photo"
-        case "Videos":      return "film"
-        case "Audio":       return "music.note"
-        case "Documents":   return "doc.text"
-        case "Archives":    return "archivebox"
-        case "Code":        return "chevron.left.forwardslash.chevron.right"
-        case "Screenshots": return "camera.viewfinder"
-        default:            return "doc"
-        }
+        OrganizationRule.defaults.first(where: { $0.category == category })?.systemImage ?? "doc"
     }
 
     private func color(for category: String) -> Color {
-        switch category {
-        case "Images":      return .blue
-        case "Videos":      return .purple
-        case "Audio":       return .pink
-        case "Documents":   return .orange
-        case "Archives":    return .brown
-        case "Code":        return .green
-        case "Screenshots": return .cyan
-        default:            return .gray
+        switch OrganizationRule.defaults.first(where: { $0.category == category })?.colorName {
+        case "blue":   return .blue
+        case "purple": return .purple
+        case "pink":   return .pink
+        case "orange": return .orange
+        case "brown":  return .brown
+        case "green":  return .green
+        case "cyan":   return .cyan
+        default:       return .gray
         }
     }
 }

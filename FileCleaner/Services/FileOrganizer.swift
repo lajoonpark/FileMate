@@ -38,12 +38,13 @@ class FileOrganizer: ObservableObject {
         let base   = url.deletingPathExtension().lastPathComponent
         let ext    = url.pathExtension
         let folder = url.deletingLastPathComponent()
-        var i = 1
-        while true {
+        for i in 1...10_000 {
             let name      = ext.isEmpty ? "\(base)_\(i)" : "\(base)_\(i).\(ext)"
             let candidate = folder.appendingPathComponent(name)
             if !fm.fileExists(atPath: candidate.path) { return candidate }
-            i += 1
         }
+        // Fallback: append a UUID to guarantee uniqueness
+        let uniqueName = ext.isEmpty ? "\(base)_\(UUID().uuidString)" : "\(base)_\(UUID().uuidString).\(ext)"
+        return folder.appendingPathComponent(uniqueName)
     }
 }

@@ -10,11 +10,12 @@ class AppUndoManager {
     private let logURL: URL
 
     init() {
-        let support = FileManager.default.urls(
-            for: .applicationSupportDirectory, in: .userDomainMask
-        ).first!
-        let dir = support.appendingPathComponent("FileCleaner", isDirectory: true)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let fm = FileManager.default
+        let fallback = fm.temporaryDirectory.appendingPathComponent("FileCleaner", isDirectory: true)
+        let appSupport = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        let base = appSupport ?? fallback
+        let dir = base.appendingPathComponent("FileCleaner", isDirectory: true)
+        try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
         logURL = dir.appendingPathComponent("undo_log.json")
     }
 

@@ -45,12 +45,7 @@ struct RulesEditorView: View {
                             "Comma-separated (e.g. jpg, png)",
                             text: Binding(
                                 get: { rule.extensions.joined(separator: ", ") },
-                                set: {
-                                    rule.extensions = $0
-                                        .components(separatedBy: ",")
-                                        .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
-                                        .filter { !$0.isEmpty }
-                                }
+                                set: { rule.extensions = OrganizationRule.parseExtensions($0) }
                             )
                         )
                     }
@@ -79,15 +74,6 @@ struct RulesEditorView: View {
     // MARK: - Helpers
 
     private func iconName(for category: String) -> String {
-        switch category {
-        case "Images":      return "photo"
-        case "Videos":      return "film"
-        case "Audio":       return "music.note"
-        case "Documents":   return "doc.text"
-        case "Archives":    return "archivebox"
-        case "Code":        return "chevron.left.forwardslash.chevron.right"
-        case "Screenshots": return "camera.viewfinder"
-        default:            return "doc"
-        }
+        OrganizationRule.defaults.first(where: { $0.category == category })?.systemImage ?? "doc"
     }
 }
