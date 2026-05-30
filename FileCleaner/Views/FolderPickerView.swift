@@ -58,7 +58,7 @@ struct FolderPickerView: View {
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
         panel.prompt = "Choose Folder"
-        panel.message = "Select the folder you want File Cleaner to organize."
+        panel.message = "Select the folder you want FileMate to organize."
         if panel.runModal() == .OK, let url = panel.url {
             onFolderSelected(url)
         }

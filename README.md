@@ -1,11 +1,12 @@
-# File Cleaner 🗂️
+# FileMate ✨
 
-A native macOS app that sorts your messy folders into clean, organized subfolders — **no deletions, ever**.
+A native macOS app that helps you manage your files — organize messy folders into clean subfolders and search for any file on your system.
 
 ---
 
 ## Features
 
+### Organize
 - **Drag-and-drop or pick a folder** — drop any folder onto the window or click "Choose Folder"
 - **Dry-run preview** — see exactly where every file will go before anything moves
 - **Selective organization** — uncheck individual files to skip them
@@ -13,6 +14,12 @@ A native macOS app that sorts your messy folders into clean, organized subfolder
 - **Custom rules** — edit which extensions map to which category via the "Rules…" panel
 - **Recursive mode** — optionally organize files inside sub-folders too
 - **Collision-safe** — duplicate names get `_1`, `_2`, … suffixes, never overwritten
+
+### Search
+- **Find any file** — search every file by name inside any folder on your Mac
+- **Live results** — results stream in as the search runs, with file size and modification date
+- **Quick actions** — Reveal in Finder or Open directly from search results
+- **Scoped search** — pick any folder as the search root
 
 ### Default categories
 
@@ -53,7 +60,7 @@ A native macOS app that sorts your messy folders into clean, organized subfolder
 
 1. In Xcode: **Product → Archive**
 2. Click **Distribute App → Copy App**
-3. Zip the exported `FileCleaner.app` and share it
+3. Zip the exported `FileMate.app` and share it
 
 > **Unsigned builds:** right-click → Open the first time to bypass Gatekeeper.
 
@@ -61,8 +68,9 @@ A native macOS app that sorts your messy folders into clean, organized subfolder
 
 ## User Flow
 
+### Organize mode
 ```
-Launch
+Launch → Organize tab
   └─ Drop / Choose Folder
        └─ Scanning spinner
             └─ Preview Table (File | Category | Will Move To)
@@ -70,6 +78,14 @@ Launch
                       └─ Progress bar
                            └─ Done! N files organized
                                 └─ [Undo All]  [Open Folder]  [Done]
+```
+
+### Search mode
+```
+Launch → Search tab
+  └─ Type a file name
+       └─ Live streaming results (name, path, size, date)
+            └─ [Reveal in Finder]  [Open]
 ```
 
 ---
@@ -82,11 +98,12 @@ FileCleaner/
 ├── App/
 │   └── FileCleanerApp.swift        # @main entry point
 ├── Views/
-│   ├── ContentView.swift           # app state machine
+│   ├── ContentView.swift           # mode switcher (Organize / Search) + organize state machine
 │   ├── FolderPickerView.swift      # drop zone + NSOpenPanel
 │   ├── PreviewView.swift           # sortable Table with checkboxes
 │   ├── CleanProgressView.swift     # done / undo screen
-│   └── RulesEditorView.swift       # edit category → extension mappings
+│   ├── RulesEditorView.swift       # edit category → extension mappings
+│   └── SearchView.swift            # live file search with streaming results
 ├── Models/
 │   ├── FileItem.swift              # one file + proposed destination
 │   └── OrganizationRule.swift      # category with extension list

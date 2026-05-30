@@ -1,6 +1,21 @@
 import SwiftUI
 
-/// App state machine — drives which screen is shown.
+// MARK: - App mode
+
+enum AppMode: String, CaseIterable {
+    case organize = "Organize"
+    case search   = "Search"
+
+    var systemImage: String {
+        switch self {
+        case .organize: return "folder.badge.gearshape"
+        case .search:   return "magnifyingglass"
+        }
+    }
+}
+
+// MARK: - Organize state machine
+
 enum AppState {
     case pickFolder
     case scanning
@@ -11,8 +26,11 @@ enum AppState {
     case error(String)
 }
 
+// MARK: - Content view
+
 struct ContentView: View {
     @StateObject private var organizer = FileOrganizer()
+    @State private var appMode: AppMode = .organize
     @State private var appState: AppState = .pickFolder
     @State private var selectedFolder: URL?
     @State private var rules: [OrganizationRule] = OrganizationRule.defaults
@@ -21,7 +39,6 @@ struct ContentView: View {
     @State private var moveRecords: [(from: URL, to: URL)] = []
 
     private let undoMgr = AppUndoManager()
-    private let scanner = FileScanner()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,16 +56,42 @@ struct ContentView: View {
     @ViewBuilder
     private var toolbar: some View {
         HStack(spacing: 12) {
-            Image(systemName: "folder.badge.gearshape")
-                .font(.title2)
-                .foregroundStyle(.blue)
-            Text("File Cleaner")
-                .font(.headline)
+            // App brand
+            Label("FileMate", systemImage: "sparkles")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.blue, .purple],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .labelStyle(.titleAndIcon)
+
+            Divider().frame(height: 18)
+
+            // Mode picker
+            Picker("Mode", selection: $appMode) {
+                ForEach(AppMode.allCases, id: \.self) { mode in
+                    Label(mode.rawValue, systemImage: mode.systemImage).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 210)
+            .onChange(of: appMode) { _ in
+                // Reset organize flow when switching away
+                if appMode == .search { appState = .pickFolder }
+            }
+
             Spacer()
-            Toggle("Recursive", isOn: $recursive)
-                .toggleStyle(.checkbox)
-                .help("Also organize files inside sub-folders")
-            Button("Rules…") { showRulesEditor = true }
+
+            // Organize-only controls
+            if appMode == .organize {
+                Toggle("Recursive", isOn: $recursive)
+                    .toggleStyle(.checkbox)
+                    .help("Also organize files inside sub-folders")
+                Button("Rules…") { showRulesEditor = true }
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -58,6 +101,17 @@ struct ContentView: View {
 
     @ViewBuilder
     private var content: some View {
+        switch appMode {
+        case .search:
+            SearchView()
+
+        case .organize:
+            organizeContent
+        }
+    }
+
+    @ViewBuilder
+    private var organizeContent: some View {
         switch appState {
         case .pickFolder:
             FolderPickerView { folder in
